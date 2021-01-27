@@ -1,0 +1,25 @@
+#Define VARS
+GIT_USERNAME="edwardboucher"
+GIT_EMAIL="edbouch@yahoo.com"
+SALT_STATE_DIR="/srv/salt/"
+SALT_STATE_NAME="ntp"
+
+#SET
+sudo salt 'salt' git.config_set user.name edwardboucher global=True user=linuxadmin
+sudo salt 'salt' git.config_set user.email edbouch@yahoo.com global=True user=linuxadmin
+
+#VERIFY
+sudo salt 'salt' git.config_get user.name user=linuxadmin global=True
+sudo salt 'salt' git.config_get user.email user=linuxadmin global=True
+
+#CREATE file_roots directory FOR STATES:
+sudo mkdir /srv/salt
+sudo chgrp salt /srv/salt/
+sudo chmod 775 /srv/salt/
+sudo chmod g+s /srv/salt/
+
+#START NEW SESSION
+sudo mkdir /srv/salt/ntp
+sudo salt 'salt' git.init cwd=/srv/salt/ntp
+#Add the remote origin:
+sudo salt 'salt' git.remote_set /srv/salt/ntp https://github.com/edwardboucher/challenge01.git

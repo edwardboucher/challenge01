@@ -1,0 +1,2 @@
+cd /srv/salt
+  curl -O https://raw.githubusercontent.com/linuxacademy/content-ssce-files/master/hostname.sls

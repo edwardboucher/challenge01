@@ -1,0 +1,80 @@
+##VENDOREXAMPLES######################################
+Using Vault REST API
+
+# Secret Config info
+curl -H "X-Vault-Token:$VAULT_TOKEN" http://127.0.0.1:8200/v1/secret/config
+
+# Get secret
+curl -H "X-Vault-Token:$VAULT_TOKEN" http://127.0.0.1:8200/v1/secret/data/cookie
+
+# Write secret
+curl -X POST -H "X-Vault-Token:$VAULT_TOKEN" -d '{"data":{"password":"somesecret","desc":"test user"}}' http://127.0.0.1:8200/v1/secret/data/user2
+
+# Delete secret
+curl --request DELETE -H "X-Vault-Token:$VAULT_TOKEN" http://127.0.0.1:8200/v1/secret/data/user2
+
+# Destroy secret version
+curl -X POST -H "X-Vault-Token:$VAULT_TOKEN" -d '{"versions": [1, 2]}' http://127.0.0.1:8200/v1/secret/destroy/user2
+
+# Enable AppRole auth method
+$ curl --silent --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"type": "approle"}' http://127.0.0.1:8200/v1/sys/auth/approle
+
+# Create/Update role saltmaster
+$ curl --silent --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"type": "approle"}' http://127.0.0.1:8200/v1/sys/auth/approle
+payload_approle_saltmaster.json:
+{
+"policies":"default",
+"secret_id_ttl": 0,
+"secret_id_num_uses": 0,
+"token_type":"service",
+"token_num_uses": 0,
+"token_ttl": 0,
+"token_max_ttl": 0,
+"role_name":"saltmaster"
+}
+
+# List roles
+curl --silent --header "X-Vault-Token:$VAULT_TOKEN" --request LIST http://127.0.0.1:8200/v1/auth/approle/role | jq '.'
+
+# Fetch role_id and secret_id
+curl --silent --header "X-Vault-Token: $VAULT_TOKEN" http://127.0.0.1:8200/v1/auth/approle/role/saltmaster/role-id | jq '.'
+curl --silent --header "X-Vault-Token: $VAULT_TOKEN" --request POST http://127.0.0.1:8200/v1/auth/approle/role/saltmaster/secret-id | jq '.'\
+
+# Login (get token) with AppRole
+curl --silent --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"role_id":"ed300913-f084-fc55-2874-991b0c537ae9","secret_id":"30041a3b-68c1-0e09-3050-b75e1c692f95"}' http://127.0.0.1:8200/v1/auth/approle/login | jq '.'
+
+# Get token with basic token auth method
+curl --silent --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data @payload_token.json http://127.0.0.1:8200/v1/auth/token/create | jq '.'
+payload_token.json:
+{
+"policies": [ "default" ],
+"metadata": {
+"user": "adrian"
+},
+"ttl": "4h",
+"renewable": true,
+"num_uses": 0
+}
+
+##MYEXAMPLES######################################
+# Get secret (general)
+curl \
+-H "X-Vault-Token:${VAULT_TOKEN}" \
+-H "X-Vault-Namespace:ns1/ns2/" -X GET \
+${VAULT_URL}/v1/cubbyhole/cookie
+
+# new secret (git)
+read -s -p "Password: " PASSWORD
+curl \
+-X POST \
+-H "X-Vault-Token:$VAULT_TOKEN" \
+-d '{"data":{"password":"blahblah","desc":"git user"}}' ${VAULT_URL}/v1/cubbyhole/git_user1
+
+# Get secret (git)
+GIT_PASSW=$(curl \
+-H "X-Vault-Token:${VAULT_TOKEN}" \
+-H "X-Vault-Namespace:ns1/ns2/" -X GET \
+${VAULT_URL}/v1/cubbyhole/git_user1 \
+| cut -d : -f 9 | cut -d \" -f 2)
+
+# parse password : echo $OUTPUT | cut -d : -f 9 | cut -d \" -f 2

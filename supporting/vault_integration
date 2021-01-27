@@ -1,0 +1,132 @@
+# 00: Setup ENV in VAULT IN UNSEALED VAULT VIA SSH:
+export VAULT_ADDR=http://127.0.0.1:8200
+# 01: enable secret engine for salt/ path
+vault secrets enable -version=2 -path=salt/ kv
+vault secrets list -detailed
+
+# 02: create policy file for "saltmaster"..
+
+# 03: Write to content (/etc/vault/saltmaster.hcl)
+###############################
+cat << EOF > /etc/vault/saltmaster.hcl
+# This section grants all access on "salt/*". 
+
+# Further restrictions can be applied to this broad policy, as shown below.
+# Minimum required access for KV secrets engine V1 and V2
+
+# V1
+path "salt/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "salt/" {
+  capabilities = ["list"]
+}
+
+# V2
+path "salt/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "salt/data/" {
+  capabilities = ["list"]
+}
+
+# THIS ENTRY ALLOW SALTUTIL.PILLAR_REFRESH TO WORK PROPERLY
+path "auth/token/create" {
+ capabilities = ["create", "read", "update"]
+}
+EOF
+###############################
+# 04: Upload policy saltmaster:
+vault policy write saltmaster /etc/vault/saltmaster.hcl
+
+# 05: PUT and GET sample data:
+NEW_USER="salt_user1"
+NEW_PASSW="p4ssw0rd98765"
+vault kv put salt/$NEW_USER password=$NEW_PASSW desc="salt test user"
+vault kv get salt/$NEW_USER
+
+# 06: Enable AppRole authentication method:, if not already.
+vault auth enable approle
+
+# 07: Create Approle for saltmaster. token_num_uses and token use needs to be as follows.
+vault write auth/approle/role/saltmaster policies="saltmaster" token_num_uses=0 secret_id_num_uses=0 token_ttl=3600 secret_id_ttl=31536000 token_type=service role_name=saltmaster
+
+# 08: VERIFY
+vault read auth/approle/role/saltmaster
+ROLE_ID=$(vault read -field role_id auth/approle/role/saltmaster/role-id)
+SECRET_ID=$(vault write -field secret_id -f auth/approle/role/saltmaster/secret-id)
+TOKEN=$(vault write -field  token auth/approle/login role_id=$ROLE_ID secret_id=$SECRET_ID)
+export VAULT_TOKEN=$TOKEN
+vault kv get salt/NEW_USER
+
+# 09: Write to content on SALT MASTER (/etc/salt/master.d/vault.conf)
+###############################
+cat << EOF > /etc/salt/master.d/vault.conf
+# SDB CONFIG
+myvault:
+  driver: vault
+
+# VAULT CONFIG FOR TOKEN OR APPROLE AUTH MODE
+vault:
+  url: "$VAULT_URL"
+  auth:
+    method: approle
+    role_id: "$ROLE_ID"
+    secret_id: "$SECRET_ID"
+  policies:
+    - saltmaster
+EOF
+###############################
+
+# 10: restart Salt Master and TEST
+service salt-master stop
+#TEST
+salt-master -l debug
+service salt-master stop
+#delete vault.conf if major problems
+service salt-master start
+
+# 11: Test with SDB runner
+salt-run sdb.get sdb://myvault/salt/data/$(printf %q "${NEW_USER%.001}") --out=json
+
+# 12: Assign pillar
+###############################
+cat << EOF > /srv/pillar/top.sls
+ base:
+  '*':
+    - srv1_access
+ EOF
+###############################
+
+# 13: Create a pillar file (/srv/pillar/srv1_access.sls)
+###############################
+cat << EOF > /srv/pillar/srv1_access.sls
+{% set srv1_access = salt['sdb.get']('sdb://myvault/salt/data/user1') %}
+srv1_access: {{ srv1_access['data']|tojson }}
+EOF
+###############################
+
+# 14: Refresh and get pillar data:
+salt \* saltutil.refresh_pillar
+salt \* pillar.items
+
+# 15: Create a test state file (/srv/salt/show_secrets.sls_) to show and use secret: 
+###############################
+cat << EOF /srv/salt/show_secrets.sls
+show_secrets:
+  test.configurable_test_state:
+    - name: Show them secrets
+    - changes: 
+False
+
+    - result: 
+True
+
+    - comment: {{ pillar['srv1_access']['password'] }}
+EOF
+###############################
+
+# 16: Run Test state
+salt minion state.sls show_secrets
