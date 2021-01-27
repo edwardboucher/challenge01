@@ -1,25 +1,27 @@
 #Define VARS
 GIT_USERNAME="edwardboucher"
 GIT_EMAIL="edbouch@yahoo.com"
+GIT_LOCAL_USER="linuxadmin"
 SALT_STATE_DIR="/srv/salt/"
 SALT_STATE_NAME="ntp"
+GIT_SOURCE="https://github.com/edwardboucher/challenge01.git"
 
 #SET
-sudo salt 'salt' git.config_set user.name edwardboucher global=True user=linuxadmin
-sudo salt 'salt' git.config_set user.email edbouch@yahoo.com global=True user=linuxadmin
+sudo salt 'salt' git.config_set user.name ${GIT_USERNAME} global=True user=${GIT_LOCAL_USER}
+sudo salt 'salt' git.config_set user.email ${GIT_EMAIL} global=True user=${GIT_LOCAL_USER}
 
 #VERIFY
-sudo salt 'salt' git.config_get user.name user=linuxadmin global=True
-sudo salt 'salt' git.config_get user.email user=linuxadmin global=True
+sudo salt 'salt' git.config_get user.name user=${GIT_LOCAL_USER} global=True
+sudo salt 'salt' git.config_get user.email user=${GIT_LOCAL_USER} global=True
 
 #CREATE file_roots directory FOR STATES:
-sudo mkdir /srv/salt
-sudo chgrp salt /srv/salt/
-sudo chmod 775 /srv/salt/
-sudo chmod g+s /srv/salt/
+sudo mkdir ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chgrp salt ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chmod 775 ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chmod g+s ${SALT_STATE_DIR}${SALT_STATE_NAME}
 
 #START NEW SESSION
-sudo mkdir /srv/salt/ntp
-sudo salt 'salt' git.init cwd=/srv/salt/ntp
+sudo mkdir ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo salt 'salt' git.init cwd=${SALT_STATE_DIR}${SALT_STATE_NAME}
 #Add the remote origin:
-sudo salt 'salt' git.remote_set /srv/salt/ntp https://github.com/edwardboucher/challenge01.git
+sudo salt 'salt' git.remote_set ${SALT_STATE_DIR}${SALT_STATE_NAME} ${GIT_SOURCE}

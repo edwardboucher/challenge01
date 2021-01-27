@@ -1,0 +1,51 @@
+#DOCS EXAMPLE
+sudo salt 'salt' sys.list_functions pkg
+sudo salt 'salt' sys.list_functions test
+##detail
+sudo salt 'salt' sys.argspec pkg.install
+sudo salt 'salt' sys.argspec pkg.*
+sudo salt 'salt' sys.doc sys.doc
+sudo salt 'salt' sys.doc test
+#all execution modules
+sudo salt 'salt' sys.list_modules
+#general sys functions
+sudo salt 'salt' sys.list_functions sys
+
+##remove
+sudo salt 'salt' pkg.remove chrony test=True
+##list repos
+sudo salt 'salt' pkg.list_repos
+
+#TESTING
+##help  
+sudo salt 'salt' sys.list_functions test
+sudo salt 'salt' sys.doc test
+##execute
+sudo salt '*' test.ping
+sudo salt 'salt' test.stack
+sudo salt 'salt' test.versions_information
+sudo salt '*' test.outputter "Hello, World!"
+
+#Add New Group/User
+sudo salt 'salt' group.add salt
+sudo salt 'salt' group.adduser salt linuxuser
+sudo salt 'salt' user.add eboucher groups=salt,sudo home=/home/eboucher shell=/bin/bash fullname="E Boucher
+
+#password
+sudo salt 'salt' shadow.gen_password 'mypassword'
+sudo salt 'salt' shadow.set_password eboucher '<hash>'
+
+#grains
+sudo salt 'salt' grains.ls
+sudo salt 'salt' grains.items
+#add grain
+sudo salt 'minion1' grains.set 'sites' external
+#convert to list and add grain
+sudo salt 'minion1' grains.append sites internal convert=True
+# remove from list
+sudo salt 'minion1' grains.remove sites internal
+#delete grain entirely
+sudo salt 'minion1' grains.delkey sites
+
+#cmd module
+sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user

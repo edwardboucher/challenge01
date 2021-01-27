@@ -1,4 +1,4 @@
-1. Create an ntp state which installs the ntp package..
+1. Create an ntp state which installs the ntp package.
 2. Add the ntp service to your ntp state and make sure it is running and enabled.
 3. Create a state which runs ntpdate 0.centos.pool.ntp.org to force a time sync
 4. Put your ntp states into a formula

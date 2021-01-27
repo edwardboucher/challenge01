@@ -1,2 +1,24 @@
-cd /srv/salt
-  curl -O https://raw.githubusercontent.com/linuxacademy/content-ssce-files/master/hostname.sls
+SALT_STATE_DIR="/srv/salt/"
+SALT_STATE_NAME="ntp"
+sudo mkdir ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chgrp salt ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chmod 775 ${SALT_STATE_DIR}${SALT_STATE_NAME}
+sudo chmod g+s ${SALT_STATE_DIR}${SALT_STATE_NAME}
+
+cd /srv/salt/ntp
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls
+sudo salt 'salt' state.sls ntp.service test=true
+
+#SALT FILE server
+mkdir /srv/salt/ntp/files
+cd /srv/salt/ntp/files
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp.conf
+#sudo salt 'salt' cp.get_file salt://ntp/files/ntpd.conf /etc/ntpd.conf runas=user
+cd /srv/salt/ntp/
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/config.sls
+sudo salt 'salt' state.sls ntp.config test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config,ntp.restart test=true
+
+#formula
+sudo salt 'salt' state.sls ntp test=true
