@@ -1,4 +1,4 @@
-SALT_PILLAR_ROOT="/srv/salt/pillar/"
+SALT_PILLAR_ROOT="/srv/pillar/"
 sudo mkdir ${SALT_PILLAR_ROOT}
 sudo chgrp salt ${SALT_PILLAR_ROOT}
 sudo chmod 775 ${SALT_PILLAR_ROOT}
