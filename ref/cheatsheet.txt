@@ -49,3 +49,5 @@ sudo salt 'minion1' grains.delkey sites
 
 #cmd module
 sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
+
+#formulas:

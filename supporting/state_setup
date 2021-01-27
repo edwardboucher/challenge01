@@ -19,6 +19,8 @@ curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_sta
 sudo salt 'salt' state.sls ntp.config test=true
 sudo salt 'salt' state.sls ntp.service,ntp.config test=true
 sudo salt 'salt' state.sls ntp.service,ntp.config,ntp.restart test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config,ntp.restart,ntp.query test=true
 
 #formula
 sudo salt 'salt' state.sls ntp test=true
+sudo salt '*' state.highstate test=true
