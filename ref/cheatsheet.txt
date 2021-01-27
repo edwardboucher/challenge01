@@ -47,7 +47,7 @@ sudo salt 'minion1' grains.remove sites internal
 #delete grain entirely
 sudo salt 'minion1' grains.delkey sites
 
-#cmd module
+#cmd module (example)
 sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
 
 #formulas:

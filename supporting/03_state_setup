@@ -1,0 +1,40 @@
+SALT_STATE_DIR="/srv/salt/"
+SALT_STATE_NAME="ntp"
+sudo mkdir ${SALT_STATE_DIR}
+sudo chgrp salt ${SALT_STATE_DIR}
+sudo chmod 775 ${SALT_STATE_DIR}
+sudo chmod g+s ${SALT_STATE_DIR}
+bash
+
+cd /srv/salt/ntp
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls
+sudo salt 'salt' state.sls ntp.service test=true
+
+#SALT FILE server
+mkdir /srv/salt/ntp/files
+cd /srv/salt/ntp/files
+#COPY CONF files - "_templ" has the variables and willbe used in the formula.
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp.conf
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_templ.conf
+#manual method to copy conf file- - is superseeded by templ and formula
+#sudo salt 'salt' cp.get_file salt://ntp/files/ntpd.conf /etc/ntpd.conf runas=user
+
+#copy data into NTP state folder
+cd /srv/salt/ntp/
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/config.sls
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/init.sls
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/restart.sls
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/remove.sls
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/query.sls
+
+sudo salt 'salt' state.sls ntp.config test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config,ntp.restart test=true
+sudo salt 'salt' state.sls ntp.service,ntp.config,ntp.restart,ntp.query test=true
+cd /srv/salt/
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/top_state/top.sls
+#highstate
+#formula
+sudo salt 'salt' state.sls ntp test=true
+sudo salt '*' state.highstate test=true

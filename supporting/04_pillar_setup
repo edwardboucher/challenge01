@@ -1,0 +1,9 @@
+SALT_PILLAR_ROOT="/srv/salt/pillar/"
+sudo mkdir ${SALT_PILLAR_ROOT}
+sudo chgrp salt ${SALT_PILLAR_ROOT}
+sudo chmod 775 ${SALT_PILLAR_ROOT}
+sudo chmod g+s ${SALT_PILLAR_ROOT}
+bash
+#<add pillar data ${SALT_PILLAR_ROOT}ntp.sls
+sudo salt '*' saltutil.refresh_pillar
+sudo salt '*' pillar.items
