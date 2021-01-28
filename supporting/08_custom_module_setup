@@ -1,12 +1,15 @@
 mkdir /srv/salt/
 cd /srv/salt/
 #module prereq state
-curl -O 
+sudo curl -O 
 https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp_module/ntpmodule.sls
 sudo salt '*' state.apply
 sudo mkdir /srv/salt/_modules
+sudo chgrp salt /srv/salt/_modules
+sudo chmod 775 /srv/salt/_modules
+sudo chmod g+s /srv/salt/_modules
 cd /srv/salt/_modules
-https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp_module/ntpmodule.py
-
+sudo curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp_module/ntpmodule.py
+sudo curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp_module/ntpmodule_example.py
 sudo salt '*' saltutil.sync_modules
-sudo  salt '*' ntpmodule.get KPHL
+sudo  salt '*' ntpmodule.get <variable>
