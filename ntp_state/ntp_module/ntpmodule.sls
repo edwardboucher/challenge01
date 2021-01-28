@@ -1,8 +1,8 @@
 #do nodes have PIP installed?
-python-pip:
+python3-pip:
   pkg.installed
 
 requests:
   pip.installed:
     - require:
-      - pkg: python-pip
+      - pkg: python3-pip

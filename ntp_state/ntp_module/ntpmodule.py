@@ -7,7 +7,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-__virtual_name__ = 'weather'
+__virtual_name__ = 'ntpmodule'
 
 def __virtual__():
     '''
