@@ -1,0 +1,11 @@
+mkdir /srv/salt/
+cd /srv/salt/
+#module prereq state
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_module/ntpmodule.sls
+salt '*' state.apply
+mkdir /srv/salt/_modules
+cd /srv/salt/_modules
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_module/ntpmodule.py
+
+salt '*' saltutil.sync_modules
+salt '*' ntpmodule.get KPHL

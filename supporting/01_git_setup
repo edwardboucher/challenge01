@@ -25,3 +25,9 @@ sudo mkdir ${SALT_STATE_DIR}${SALT_STATE_NAME}
 sudo salt 'salt' git.init cwd=${SALT_STATE_DIR}${SALT_STATE_NAME}
 #Add the remote origin:
 sudo salt 'salt' git.remote_set ${SALT_STATE_DIR}${SALT_STATE_NAME} ${GIT_SOURCE}
+
+#Ignore
+
+echo *.log >> .gitignore 
+git rm --cached debug.log rm 'history.log' setup
+git commit -m "Start ignoring *.log" 

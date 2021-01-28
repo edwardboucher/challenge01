@@ -1,0 +1,8 @@
+SALT_ORCH_ROOT="/srv/salt/"
+sudo mkdir ${SALT_ORCH_ROOT}
+sudo chgrp salt ${SALT_ORCH_ROOT}
+sudo chmod 775 ${SALT_ORCH_ROOT}
+sudo chmod g+s ${SALT_ORCH_ROOT}
+bash
+cd ${SALT_ORCH_ROOT}
+curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/orchestration/setup.sls
