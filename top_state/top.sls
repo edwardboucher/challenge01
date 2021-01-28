@@ -3,3 +3,5 @@ base:
     - ntp
   'minion1':
     - hostname
+  '*'
+    - ntpmodule
