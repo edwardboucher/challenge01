@@ -1,6 +1,6 @@
 mkdir /srv/salt/_grains
 cd /srv/salt/_grains
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_custom_grain.py
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_custom_grain.py -o ./ntp_custom_grain.py
 sudo salt '*' saltutil.sync_grains
 sudo salt '*' grains.ls
 sudo salt '*' grains.items

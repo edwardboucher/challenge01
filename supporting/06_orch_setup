@@ -5,4 +5,4 @@ sudo chmod 775 ${SALT_ORCH_ROOT}
 sudo chmod g+s ${SALT_ORCH_ROOT}
 bash
 cd ${SALT_ORCH_ROOT}
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/orchestration/setup.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/orchestration/setup.sls -o ./setup.sls

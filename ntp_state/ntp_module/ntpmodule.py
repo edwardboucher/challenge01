@@ -1,4 +1,5 @@
 import logging
+import subprocess
 try:
     import os
     HAS_OS = True
@@ -17,16 +18,12 @@ def __virtual__():
         return __virtual_name__
     else:
         return False, 'The ntpmodule module cannot be loaded: os package unavailable, check pip.'
-def _make_request():
-    service = "ntpd"
-    p =  subprocess.Popen(["systemctl", "is-active",  service], stdout=subprocess.PIPE)
-    (output, err) = p.communicate()
-    output = output.decode('utf-8')
-    output_str=output.encode('ascii','ignore')
-    try:
-        output_str.index('active')
-    except ValueError:
-        my_grain = {'ntp_initialized': 'False'}
-    else:
-        my_grain = {'ntp_initialized': 'True'}
-    return my_grain
+
+def get():
+    return_value = {}
+    output = subprocess.check_output("sudo service ntpd status | grep Active",shell=True)
+    return output
+
+def _interrogate_service():
+    output = subprocess.check_output("sudo service ntpd status | grep Active",shell=True)
+    return output

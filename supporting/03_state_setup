@@ -7,26 +7,26 @@ sudo chmod g+s ${SALT_STATE_DIR}
 bash
 
 cd /srv/salt/ntp
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls -o ./service.sls
 sudo salt 'salt' state.sls ntp.service test=true
 
 #SALT FILE server
 mkdir /srv/salt/ntp/files
 cd /srv/salt/ntp/files
 #COPY CONF files - "_templ" has the variables and willbe used in the formula.
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp.conf
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_templ.conf
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp.conf -o ./ntp.conf
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_templ.conf -o ./ntp_templ.conf
 #manual method to copy conf file- - is superseeded by templ and formula
 #sudo salt 'salt' cp.get_file salt://ntp/files/ntpd.conf /etc/ntpd.conf runas=user
 
 #copy data into NTP state folder
 cd /srv/salt/ntp/
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/config.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/init.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/restart.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/remove.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/query.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/config.sls -o ./config.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/init.sls -o ./init.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/service.sls -o ./service.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/restart.sls -o ./restart.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/remove.sls -o ./remove.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/query.sls -o ./query.sls
 
 sudo salt 'salt' state.sls ntp.config test=true
 sudo salt 'salt' state.sls ntp.service,ntp.config test=true
@@ -42,7 +42,7 @@ sudo chmod g+s ${SALT_STATE_DIR}
 bash
 
 cd /srv/salt/
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/top_state/top.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/top_state/top.sls -o ./top.sls 
 #highstate
 sudo salt '*' state.highstate test=true
 #formula

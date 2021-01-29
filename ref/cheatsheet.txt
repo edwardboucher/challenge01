@@ -50,4 +50,24 @@ sudo salt 'minion1' grains.delkey sites
 #cmd module (example)
 sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
 
-#formulas:
+#further research:
+#MIGHT this work better..##########################################
+ewrelic_php_ini:
+  file.replace:
+  {% if grains['os_family'] == 'RedHat' %}
+    - name: /etc/php.d/newrelic.ini
+  {% elif grains['os_family'] == 'Debian' %}
+    - name: /etc/php5/mods-available/newrelic.ini
+  {% endif %}
+    - pattern: 'newrelic.license = .*'
+    - repl: newrelic.license = "{{ salt['pillar.get']('newrelic:apikey', '') }}"
+##########################################
+
+##PYTHON##
+output = subprocess.check_output("sudo systemctl status ntpd | grep Active:", shell=True)
+
+#SITES USED
+https://www.linode.com/docs/guides/create-a-salt-execution-module/
+https://linuxacademy.com/
+https://docs.saltproject.io/en/latest/
+https://implement.pt/2019/01/an-advanced-guide-to-salt/

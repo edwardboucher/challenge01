@@ -6,7 +6,7 @@ sudo chmod g+s ${SALT_PILLAR_ROOT}
 bash
 #<add pillar data 
 cd ${SALT_PILLAR_ROOT}
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_pillar/ntp.sls
-curl -O https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_pillar/top.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_pillar/ntp.sls -o ./ntp.sls
+curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_pillar/top.sls -o ./top.sls
 sudo salt '*' saltutil.refresh_pillar
 sudo salt '*' pillar.items
