@@ -4,6 +4,7 @@ AWS_ACCESS_KEY="xxxx"
 AWS_ACCESS_ID="xxxx"
 AWS_KEYPAIR_FILE="salt_ec2_keypair.pem"
 AWS_KEYPAIR_NAME="salt_ec2_keypair"
+#this must be public IP?
 AWS_SALT_MASTER="xxxxx.us-east-2.compute.amazonaws.com"
 
 #RHEL-8.3.0_HVM-20201031-x86_64-0-Hourly2-GP2 (ami-03d64741867e7bb94)
@@ -22,8 +23,8 @@ sudo systemctl restart salt-master
 #create keypair
 #create api key with Administratoraccess role
 cd '/Users/eboucher/Dropbox/AWS/AWS Keypairs/agile_defense_keypairs'
-scp -i ./aws_adds_keypair.pem ./salt_ec2_keypair_va.pem ec2-user@ec2-3-14-247-213.us-east-2.compute.amazonaws.com:/tmp
-ssh -i ./aws_adds_keypair.pem ec2-user@ec2-3-14-247-213.us-east-2.compute.amazonaws.com
+scp -i ./aws_adds_keypair.pem ./salt_ec2_keypair_va.pem ec2-user@ec2-xxx-xxx-xxx-xxx.us-east-2.compute.amazonaws.com:/tmp
+ssh -i ./aws_adds_keypair.pem ec2-user@ec2-xxx-xxx-xxx-xxx.us-east-2.compute.amazonaws.com
 cd /tmp
 sudo mv ./salt_ec2_keypair_va.pem /etc/salt/pki/master/
 sudo chmod 400 /etc/salt/pki/master/salt_ec2_keypair_va.pem
