@@ -1,0 +1,59 @@
+#REDHAT
+#AMI ID
+AWS_ACCESS_KEY="xxxx" 
+AWS_ACCESS_ID="xxxx"
+AWS_KEYPAIR_FILE="salt_ec2_keypair.pem"
+AWS_KEYPAIR_NAME="salt_ec2_keypair"
+AWS_SALT_MASTER="xxxxx.us-east-2.compute.amazonaws.com"
+
+#RHEL-8.3.0_HVM-20201031-x86_64-0-Hourly2-GP2 (ami-03d64741867e7bb94)
+sudo yum update
+#Installs the latest release. Updating installs the latest release even if it is a new major version.
+#Run the following commands to install the SaltStack repository and key:
+sudo yum install https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest.el8.noarch.rpm
+Run sudo yum clean expire-cache
+#Install the salt-minion, salt-master, or other Salt components:
+sudo yum install salt-master
+sudo yum install salt-ssh
+sudo yum install salt-cloud
+sudo yum install salt-api
+#(Upgrade only) Restart all upgraded services, for example:
+sudo systemctl restart salt-master
+#create keypair
+#create api key with Administratoraccess role
+cd '/Users/eboucher/Dropbox/AWS/AWS Keypairs/agile_defense_keypairs'
+scp -i ./aws_adds_keypair.pem ./salt_ec2_keypair_va.pem ec2-user@ec2-3-14-247-213.us-east-2.compute.amazonaws.com:/tmp
+ssh -i ./aws_adds_keypair.pem ec2-user@ec2-3-14-247-213.us-east-2.compute.amazonaws.com
+cd /tmp
+sudo mv ./salt_ec2_keypair_va.pem /etc/salt/pki/master/
+sudo chmod 400 /etc/salt/pki/master/salt_ec2_keypair_va.pem
+#provider setup
+###############################
+cat << EOF > /etc/salt/cloud.providers.d/ec2.conf
+ ec2-web:
+   driver: ec2
+   id: '$AWS_ACCESS_ID'
+   key: '$AWS_ACCESS_KEY'
+   private_key: /etc/salt/pki/master/$AWS_KEYPAIR_FILE
+   keyname: salt_ec2_keypair
+   securitygroup: default
+EOF
+###############################
+sudo cd /etc/salt/cloud.profiles.d/
+###############################
+cat <<EOF >> /etc/salt/cloud.profiles.d/ec2.conf
+tiny-server:
+   provider: ec2-web
+   image: ami-a4dc46db
+   ssh_username: ubuntu
+   size: t1.micro
+   minion:
+     master: ${AWS_SALT_MASTER}
+EOF
+###############################
+#VERIFY
+sudo salt-cloud --list-profiles all
+sudo salt-cloud --list-providers
+#test
+sudo salt-cloud -p tiny-server web-salt
+sudo salt-key -L
