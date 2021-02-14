@@ -1,6 +1,16 @@
-mkdir /srv/salt/_grains
+####NTP CUSTOM GRAIN#####
+sudo mkdir -p /srv/salt/_grains
 cd /srv/salt/_grains
-curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_custom_grain.py -o ./ntp_custom_grain.py
+sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/ntp_customgrain.py -o ./ntp_custom_grain.py
+sudo salt '*' saltutil.sync_grains
+sudo salt '*' grains.ls
+sudo salt '*' grains.items
+#highstate
+sudo salt '*' state.highstate test=true
+####AWS CUSTOM GRAIN#####
+sudo mkdir -p /srv/salt/_grains
+cd /srv/salt/_grains
+sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/files/aws_customgrain.py -o ./aws_custom_grain.py
 sudo salt '*' saltutil.sync_grains
 sudo salt '*' grains.ls
 sudo salt '*' grains.items

@@ -7,6 +7,7 @@ AWS_KEYPAIR_NAME="salt_ec2_keypair"
 #this must be public IP?
 AWS_SALT_MASTER="xxxxx.us-east-2.compute.amazonaws.com"
 
+##CLOUD SETUP
 #RHEL-8.3.0_HVM-20201031-x86_64-0-Hourly2-GP2 (ami-03d64741867e7bb94)
 sudo yum update
 #Installs the latest release. Updating installs the latest release even if it is a new major version.
@@ -48,6 +49,24 @@ tiny-server:
    image: ami-a4dc46db
    ssh_username: ubuntu
    size: t1.micro
+   tag: {'project': 'salt', 'status': 'limited'}
+   del_root_vol_on_destroy: True
+   del_all_vols_on_destroy: True
+   sync_after_install: grains
+   minion:
+     master: ${AWS_SALT_MASTER}
+EOF
+###############################
+cat <<EOF >> /etc/salt/cloud.profiles.d/ec2.conf
+mac-workstation:
+   provider: ec2-web-or
+   image: ami-00dab9ab8515606fb
+   ssh_username: ec2-user
+   size: mac1.metal
+   tag: {'project': 'salt', 'status': 'limited'}
+   del_root_vol_on_destroy: True
+   del_all_vols_on_destroy: True
+   sync_after_install: grains
    minion:
      master: ${AWS_SALT_MASTER}
 EOF
@@ -56,5 +75,7 @@ EOF
 sudo salt-cloud --list-profiles all
 sudo salt-cloud --list-providers
 #test
-sudo salt-cloud -p tiny-server web-salt
+sudo salt-cloud -p tiny-server salt-minion01
 sudo salt-key -L
+#AWS EC2 METADATA######
+sudo salt '*' grains.set 'metadata_server_grains' True

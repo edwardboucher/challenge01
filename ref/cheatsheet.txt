@@ -36,8 +36,9 @@ sudo salt 'salt' shadow.gen_password 'mypassword'
 sudo salt 'salt' shadow.set_password eboucher '<hash>'
 
 #grains
-sudo salt 'salt' grains.ls
-sudo salt 'salt' grains.items
+sudo salt '*' sys.list_functions grains
+sudo salt '*' grains.ls
+sudo salt '*' grains.items
 #add grain
 sudo salt 'minion1' grains.set 'sites' external
 #convert to list and add grain
