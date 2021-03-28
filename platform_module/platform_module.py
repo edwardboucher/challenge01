@@ -2,7 +2,7 @@ import platform
 import subprocess
 
 try:
-import platform
+    import platform
     HAS_OS = True
 except ImportError:
     HAS_OS = False
