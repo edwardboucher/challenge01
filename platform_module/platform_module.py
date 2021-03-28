@@ -1,4 +1,5 @@
 import platform
+import subprocess
 
 try:
 import platform
