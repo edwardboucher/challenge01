@@ -12,3 +12,8 @@ sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_s
 #sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/ntp_state/ntp_module/ntpmodule_example.py -o ./ntpmodule_example.py
 sudo salt '*' saltutil.sync_modules
 sudo  salt '*' ntpmodule.get
+#########PLATFORM##########
+cd /srv/salt/_modules
+sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/platform_module/platform_module.py -o ./platform_module.py
+sudo salt '*' saltutil.sync_modules
+sudo  salt '*' platform_module.get

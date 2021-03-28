@@ -1,9 +1,15 @@
 SALT_STATE_DIR="/srv/salt/"
 SALT_STATE_NAME="ntp"
+SALT_STATE_FULL=${SALT_STATE_DIR}${SALT_STATE_NAME}
+SALT_ACCOUNT="vagrant"
 sudo mkdir ${SALT_STATE_DIR}
-sudo chgrp salt ${SALT_STATE_DIR}
+sudo chgrp ${SALT_ACCOUNT} ${SALT_STATE_DIR}
 sudo chmod 775 ${SALT_STATE_DIR}
 sudo chmod g+s ${SALT_STATE_DIR}
+sudo mkdir ${SALT_STATE_FULL}
+sudo chgrp ${SALT_ACCOUNT} ${SALT_STATE_FULL}
+sudo chmod 775 ${SALT_STATE_FULL}
+sudo chmod g+s ${SALT_STATE_FULL}
 bash
 
 cd /srv/salt/ntp

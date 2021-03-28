@@ -1,55 +1,87 @@
-#DOCS EXAMPLE
-sudo salt 'salt' sys.list_functions pkg
-sudo salt 'salt' sys.list_functions test
+TARGET_NODE="minion1"
+#DOCS EXAMPLE HELP
+sudo salt ${TARGET_NODE} sys.list_functions pkg
+sudo salt ${TARGET_NODE} sys.list_functions test
+
 ##detail
-sudo salt 'salt' sys.argspec pkg.install
-sudo salt 'salt' sys.argspec pkg.*
-sudo salt 'salt' sys.doc sys.doc
-sudo salt 'salt' sys.doc test
+sudo salt ${TARGET_NODE} sys.argspec pkg.install
+sudo salt ${TARGET_NODE} sys.argspec pkg.*
+sudo salt ${TARGET_NODE} sys.doc sys.doc
+sudo salt ${TARGET_NODE} sys.doc test
+sudo salt ${TARGET_NODE} sys.doc 
+
 #all execution modules
-sudo salt 'salt' sys.list_modules
+sudo salt ${TARGET_NODE} sys.list_modules
 #general sys functions
-sudo salt 'salt' sys.list_functions sys
+sudo salt ${TARGET_NODE} sys.list_functions sys
 
 ##remove
-sudo salt 'salt' pkg.remove chrony test=True
+sudo salt ${TARGET_NODE} pkg.remove chrony test=True
 ##list repos
-sudo salt 'salt' pkg.list_repos
+sudo salt ${TARGET_NODE} pkg.list_repos
 
 #TESTING
 ##help  
-sudo salt 'salt' sys.list_functions test
-sudo salt 'salt' sys.doc test
+sudo salt ${TARGET_NODE} sys.list_functions test
+sudo salt ${TARGET_NODE} sys.doc test
 ##execute
 sudo salt '*' test.ping
-sudo salt 'salt' test.stack
-sudo salt 'salt' test.versions_information
+sudo salt ${TARGET_NODE} test.stack
+sudo salt ${TARGET_NODE} test.versions_information
 sudo salt '*' test.outputter "Hello, World!"
 
 #Add New Group/User
-sudo salt 'salt' group.add salt
-sudo salt 'salt' group.adduser salt linuxuser
-sudo salt 'salt' user.add eboucher groups=salt,sudo home=/home/eboucher shell=/bin/bash fullname="E Boucher
+sudo salt ${TARGET_NODE} group.add salt
+sudo salt ${TARGET_NODE} group.adduser salt linuxuser
+sudo salt ${TARGET_NODE} user.add eboucher groups=salt,sudo home=/home/eboucher shell=/bin/bash fullname="E Boucher
 
 #password
-sudo salt 'salt' shadow.gen_password 'mypassword'
-sudo salt 'salt' shadow.set_password eboucher '<hash>'
+sudo salt ${TARGET_NODE} shadow.gen_password 'mypassword'
+sudo salt ${TARGET_NODE} shadow.set_password eboucher '<hash>'
 
 #grains
+#custom grains are local to minion
+#non inane grains are in /etc/salt/grains
 sudo salt '*' sys.list_functions grains
 sudo salt '*' grains.ls
 sudo salt '*' grains.items
+
+sudo salt '*' grains.get 'uuid'
 #add grain
 sudo salt 'minion1' grains.set 'sites' external
 #convert to list and add grain
 sudo salt 'minion1' grains.append sites internal convert=True
+
 # remove from list
 sudo salt 'minion1' grains.remove sites internal
 #delete grain entirely
 sudo salt 'minion1' grains.delkey sites
 
+
+
+#mine
+sudo -i
+cat << EOF > /etc/salt/minion.d/mine.conf
+mine_functions:
+   network.ip_addrs: []
+EOF
+
+sudo salt '*' mine.update
+sudo salt '*' mine.get '*' network.ip_addrs
+
 #cmd module (example)
 sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
+Sudo salt '*'  cmd.run "cat /etc/salt/grains"
+sudo salt '*' grains.ls | grep stig
+
+#pillars
+#no default pillars -default /srv/pillar on master
+#Only get applied when salt minion restarts OR
+sudo salt '*' saltutil.refresh_pillar
+
+#states
+Salt '*' sate.apply <state_name>
+
 
 #further research:
 #MIGHT this work better..##########################################
@@ -72,3 +104,7 @@ https://www.linode.com/docs/guides/create-a-salt-execution-module/
 https://linuxacademy.com/
 https://docs.saltproject.io/en/latest/
 https://implement.pt/2019/01/an-advanced-guide-to-salt/
+
+
+
+
