@@ -7,10 +7,9 @@ try:
 except ImportError:
     HAS_OS = False
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
 __virtual_name__ = 'platform_module'
-
 
 def get():
     return_value = {}
