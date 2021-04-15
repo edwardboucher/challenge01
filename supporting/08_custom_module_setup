@@ -14,6 +14,9 @@ sudo salt '*' saltutil.sync_modules
 sudo  salt '*' ntpmodule.get
 #########PLATFORM##########
 cd /srv/salt/_modules
-sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/platform_module/platform_module.py -o ./platform_module.py
+sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/platform_module/platform_module.py -o /srv/salt/_modules/platform_module.py
+sudo curl https://raw.githubusercontent.com/edwardboucher/challenge01/main/platform_module/platform_module_pip.sls -o /srv/salt/platform_module_pip.sls
 sudo salt '*' saltutil.sync_modules
 sudo  salt '*' platform_module.get
+
+sudo salt 'salt' state.sls platform.install_platform test=true

@@ -42,11 +42,11 @@ sudo salt ${TARGET_NODE} shadow.set_password eboucher '<hash>'
 #grains
 #custom grains are local to minion
 #non inane grains are in /etc/salt/grains
-sudo salt '*' sys.list_functions grains
-sudo salt '*' grains.ls
-sudo salt '*' grains.items
+sudo salt ${TARGET_NODE} sys.list_functions grains
+sudo salt ${TARGET_NODE} grains.ls
+sudo salt ${TARGET_NODE} grains.items
 
-sudo salt '*' grains.get 'uuid'
+sudo salt ${TARGET_NODE} grains.get 'uuid'
 #add grain
 sudo salt 'minion1' grains.set 'sites' external
 #convert to list and add grain
@@ -70,9 +70,14 @@ sudo salt '*' mine.update
 sudo salt '*' mine.get '*' network.ip_addrs
 
 #cmd module (example)
-sudo salt '*' cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
-Sudo salt '*'  cmd.run "cat /etc/salt/grains"
-sudo salt '*' grains.ls | grep stig
+sudo salt ${TARGET_NODE} cmd.run 'echo "export API_KEY=KEYDATA" >> .bashrc' runas=user
+Sudo salt ${TARGET_NODE}  cmd.run "cat /etc/salt/grains"
+sudo salt ${TARGET_NODE} grains.ls | grep stig
+#(wndows)
+sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --version
+sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --grains'
+sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --documentation pkg'
+
 
 #pillars
 #no default pillars -default /srv/pillar on master
@@ -82,6 +87,14 @@ sudo salt '*' saltutil.refresh_pillar
 #states
 Salt '*' sate.apply <state_name>
 
+#windows
+TARGET=WIN-BFJL0LTP7RD.localdomain
+#########
+sudo salt ${TARGET} cmd.run '$PSVersionTable.CLRVersion' shell=powershell
+sudo salt ${TARGET} cmd.run 'ipconfig /all' shell=powershell
+sudo salt ${TARGET} cmd.run 'shutdown /r /t 05' shell=powershell
+sudo salt ${TARGET} cmd.run 'Get-EventLog -LogName Application -Newest 10' shell=powershell
+sudo salt ${TARGET} task.create_task_from_xml test_task2 xml_path=C:\temp\test_task.xml
 
 #further research:
 #MIGHT this work better..##########################################
