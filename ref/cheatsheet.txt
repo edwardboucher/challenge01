@@ -1,9 +1,11 @@
+#VARIABLE DEF#######################
 TARGET_NODE="minion1"
-#DOCS EXAMPLE HELP
+
+#DOCS EXAMPLE HELP #######################
 sudo salt ${TARGET_NODE} sys.list_functions pkg
 sudo salt ${TARGET_NODE} sys.list_functions test
 
-##detail
+##detail 
 sudo salt ${TARGET_NODE} sys.argspec pkg.install
 sudo salt ${TARGET_NODE} sys.argspec pkg.*
 sudo salt ${TARGET_NODE} sys.doc sys.doc
@@ -15,12 +17,12 @@ sudo salt ${TARGET_NODE} sys.list_modules
 #general sys functions
 sudo salt ${TARGET_NODE} sys.list_functions sys
 
-##remove
+##remove PACKAGE #######################
 sudo salt ${TARGET_NODE} pkg.remove chrony test=True
 ##list repos
 sudo salt ${TARGET_NODE} pkg.list_repos
 
-#TESTING
+#TESTING #######################
 ##help  
 sudo salt ${TARGET_NODE} sys.list_functions test
 sudo salt ${TARGET_NODE} sys.doc test
@@ -30,16 +32,16 @@ sudo salt ${TARGET_NODE} test.stack
 sudo salt ${TARGET_NODE} test.versions_information
 sudo salt '*' test.outputter "Hello, World!"
 
-#Add New Group/User
+#Add New Group/User #######################
 sudo salt ${TARGET_NODE} group.add salt
 sudo salt ${TARGET_NODE} group.adduser salt linuxuser
-sudo salt ${TARGET_NODE} user.add eboucher groups=salt,sudo home=/home/eboucher shell=/bin/bash fullname="E Boucher
+sudo salt ${TARGET_NODE} user.add eboucher groups=salt,sudo home=/home/eboucher shell=/bin/bash fullname="E Boucher"
 
-#password
+#password #######################
 sudo salt ${TARGET_NODE} shadow.gen_password 'mypassword'
 sudo salt ${TARGET_NODE} shadow.set_password eboucher '<hash>'
 
-#grains
+#grains #######################
 #custom grains are local to minion
 #non inane grains are in /etc/salt/grains
 sudo salt ${TARGET_NODE} sys.list_functions grains
@@ -57,14 +59,44 @@ sudo salt 'minion1' grains.remove sites internal
 #delete grain entirely
 sudo salt 'minion1' grains.delkey sites
 
+# FILE OPERATIONS #######################
+#Check if file contains a string (true/false)
+salt '*' file.contains /etc/ssh/sshd_config 'Port'
+
+#Check if a file on the Salt minions contains a certain regex (search file on minions):
+salt "*" file.contains_regex /etc/resolv.conf "timeout.4"
+
+#check if file is a file or directory
+salt target file.stats /etc/hosts
+
+#Find a file
+salt '*' file.find /etc name=host\*.\*
+result
+- /etc/host.conf
+- /etc/hosts.allow
+- /etc/hosts.deny'
+
+#copy small file ( > 100kb)  from Master to minion
+salt-cp 'target' /opt/file (source)  /opt (destination)
+
+#copy dir from Master /srv/salt area to minion
+salt 'target' cp.get_dir salt://myDir /target/dir
+
+#copy large file from Master /srv/salt/distribution folder to minion
+salt 'target' cp.get_file salt://distribution/myFile.tar   /tmp/myFile.tar
+
+#list files from master:
+salt ${TARGET_NODE} cp.list_master_dirs
+salt ${TARGET_NODE} cp.stat_file salt://files/nifi/mssql-jdbc-8.2.0.jre8.jar
 
 
-#mine
+#mine #######################
 sudo -i
 cat << EOF > /etc/salt/minion.d/mine.conf
 mine_functions:
    network.ip_addrs: []
 EOF
+salt \* mine.get \* x509.get_pem_entries
 
 sudo salt '*' mine.update
 sudo salt '*' mine.get '*' network.ip_addrs
@@ -78,16 +110,28 @@ sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --version
 sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --grains'
 sudo salt ${TARGET_NODE} cmd.run 'C:\salt\salt-call.bat --documentation pkg'
 
-
-#pillars
+#pillars #######################
 #no default pillars -default /srv/pillar on master
 #Only get applied when salt minion restarts OR
 sudo salt '*' saltutil.refresh_pillar
+#Refresh pillars on all nodes
+salt \* saltutil.refresh_pillar
 
-#states
+#Look at pillar data
+salt \* pillar.items
+
+#get a Pillar value in a state file or Jinja file  (and pass a default value if no pillar is found)
+{{ salt['pillar.get']('role:name', 'default') }}
+
+#get Pillar value by passing a variable
+{% for rt in salt['pillar.get']('network:routes:{0}:networks'.format(interface)) -%}
+get nested pillar value (use semi colon to get to specific key)
+salt nycweb01 pillar.get users:joe
+
+#states #######################
 Salt '*' sate.apply <state_name>
 
-#windows
+#windows #######################
 TARGET=WIN-BFJL0LTP7RD.localdomain
 #########
 sudo salt ${TARGET} cmd.run '$PSVersionTable.CLRVersion' shell=powershell
@@ -96,28 +140,34 @@ sudo salt ${TARGET} cmd.run 'shutdown /r /t 05' shell=powershell
 sudo salt ${TARGET} cmd.run 'Get-EventLog -LogName Application -Newest 10' shell=powershell
 sudo salt ${TARGET} task.create_task_from_xml test_task2 xml_path=C:\temp\test_task.xml
 
-#further research:
-#MIGHT this work better..##########################################
-ewrelic_php_ini:
-  file.replace:
-  {% if grains['os_family'] == 'RedHat' %}
-    - name: /etc/php.d/newrelic.ini
-  {% elif grains['os_family'] == 'Debian' %}
-    - name: /etc/php5/mods-available/newrelic.ini
-  {% endif %}
-    - pattern: 'newrelic.license = .*'
-    - repl: newrelic.license = "{{ salt['pillar.get']('newrelic:apikey', '') }}"
-##########################################
+##REACTORS AND REACTORS #######################
+#The quickest way to watch the event bus is by calling the state.event runner:
+salt-run state.event pretty=True
+#REMOTELY VIA THE REST API
+(Salt's event bus can be consumed salt.netapi.rest_cherrypy.app.Events as an HTTP stream from external tools or services.)
+example: curl -SsNk https://saltmaster:8000/events?token=05A3
 
-##PYTHON##
+##FIRING EVENTS #######################
+salt-call event.fire '{"data": "message to be sent in the event"}' 'tag'
+
+#PATCHING
+
+
+##TODO #######################
+ref: MM runners
+ref: auto_accept minion key with CIDR block restriction
+ref: beacon monitoring hostname (cat /proc/sys/kernel/hostname)
+capture the "old" salt repo via S3
+
+##PYTHON #########################
 output = subprocess.check_output("sudo systemctl status ntpd | grep Active:", shell=True)
+generate random password hash
+python -c "import crypt; print(crypt.crypt('password', crypt.mksalt(crypt.METHOD_SHA512)))
 
-#SITES USED
+#SITES USED #######################
 https://www.linode.com/docs/guides/create-a-salt-execution-module/
 https://linuxacademy.com/
 https://docs.saltproject.io/en/latest/
 https://implement.pt/2019/01/an-advanced-guide-to-salt/
-
-
-
-
+https://docs.saltproject.io/en/latest/topics/beacons/index.html#id2
+https://s3.repo.saltproject.io/

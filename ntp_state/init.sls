@@ -1,5 +1,5 @@
 include:
   - ntp.service
-  - ntp.conifg
+  - ntp.config
   - ntp.query
   - ntp.restart
